@@ -10,5 +10,8 @@ export interface Inquiry {
   name: string;
   phone: string;
   message: string;
+  status?: string;
   created_at?: string;
 }
+
+export type InquiryStatus = '대기중' | '연락완료' | '상담완료';

@@ -37,3 +37,5 @@ next-env.d.ts
 /data
 inquiries.json
 .playwright-mcp
+
+.vercel

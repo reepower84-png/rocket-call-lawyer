@@ -130,3 +130,81 @@ export async function GET() {
     );
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json(
+        { error: "ID와 상태는 필수입니다." },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("inquiries")
+      .update({ status })
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json(
+        { error: "상태 변경 중 오류가 발생했습니다." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "상태가 변경되었습니다.",
+      data: data,
+    });
+  } catch (error) {
+    console.error("Error updating inquiry:", error);
+    return NextResponse.json(
+      { error: "서버 오류가 발생했습니다." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID는 필수입니다." },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabase
+      .from("inquiries")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json(
+        { error: "삭제 중 오류가 발생했습니다." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "삭제되었습니다.",
+    });
+  } catch (error) {
+    console.error("Error deleting inquiry:", error);
+    return NextResponse.json(
+      { error: "서버 오류가 발생했습니다." },
+      { status: 500 }
+    );
+  }
+}

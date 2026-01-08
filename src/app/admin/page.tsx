@@ -7,8 +7,17 @@ interface Inquiry {
   name: string;
   phone: string;
   message: string;
+  status: string;
   created_at: string;
 }
+
+const STATUS_OPTIONS = ["대기중", "연락완료", "상담완료"] as const;
+
+const STATUS_COLORS: Record<string, string> = {
+  "대기중": "bg-yellow-100 text-yellow-800",
+  "연락완료": "bg-blue-100 text-blue-800",
+  "상담완료": "bg-green-100 text-green-800",
+};
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -84,6 +93,46 @@ export default function AdminPage() {
       setInquiries([]);
     } catch {
       console.error("Failed to logout");
+    }
+  };
+
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    try {
+      const response = await fetch("/api/inquiry", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+
+      if (response.ok) {
+        setInquiries((prev) =>
+          prev.map((inquiry) =>
+            inquiry.id === id ? { ...inquiry, status: newStatus } : inquiry
+          )
+        );
+      }
+    } catch {
+      console.error("Failed to update status");
+    }
+  };
+
+  const handleDelete = async (id: number, name: string) => {
+    if (!confirm(`"${name}" 님의 문의를 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/inquiry?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setInquiries((prev) => prev.filter((inquiry) => inquiry.id !== id));
+      }
+    } catch {
+      console.error("Failed to delete inquiry");
     }
   };
 
@@ -193,29 +242,28 @@ export default function AdminPage() {
 
       {/* Stats */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <div className="text-3xl font-bold text-primary-600">{inquiries.length}</div>
             <div className="text-gray-600">총 문의</div>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="text-3xl font-bold text-green-600">
-              {inquiries.filter((i) => {
-                const today = new Date().toDateString();
-                return new Date(i.created_at).toDateString() === today;
-              }).length}
+            <div className="text-3xl font-bold text-yellow-600">
+              {inquiries.filter((i) => i.status === "대기중").length}
             </div>
-            <div className="text-gray-600">오늘 문의</div>
+            <div className="text-gray-600">대기중</div>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="text-3xl font-bold text-accent-600">
-              {inquiries.filter((i) => {
-                const now = new Date();
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                return new Date(i.created_at) >= weekAgo;
-              }).length}
+            <div className="text-3xl font-bold text-blue-600">
+              {inquiries.filter((i) => i.status === "연락완료").length}
             </div>
-            <div className="text-gray-600">이번 주 문의</div>
+            <div className="text-gray-600">연락완료</div>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="text-3xl font-bold text-green-600">
+              {inquiries.filter((i) => i.status === "상담완료").length}
+            </div>
+            <div className="text-gray-600">상담완료</div>
           </div>
         </div>
 
@@ -247,6 +295,12 @@ export default function AdminPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       상담문의
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      상태
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      관리
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -270,6 +324,29 @@ export default function AdminPage() {
                         <div className="text-sm text-gray-600 max-w-xs truncate">
                           {inquiry.message || "-"}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <select
+                          value={inquiry.status || "대기중"}
+                          onChange={(e) => handleStatusChange(inquiry.id, e.target.value)}
+                          className={`text-sm font-medium px-3 py-1 rounded-full border-0 cursor-pointer ${
+                            STATUS_COLORS[inquiry.status || "대기중"] || STATUS_COLORS["대기중"]
+                          }`}
+                        >
+                          {STATUS_OPTIONS.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleDelete(inquiry.id, inquiry.name)}
+                          className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors"
+                        >
+                          삭제
+                        </button>
                       </td>
                     </tr>
                   ))}
