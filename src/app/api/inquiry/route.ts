@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, Inquiry } from "@/lib/supabase";
+import { supabase, supabaseAdmin, Inquiry } from "@/lib/supabase";
 
 async function sendDiscordNotification(inquiry: Inquiry) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
@@ -143,7 +143,8 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase
+    // RLS 우회를 위해 서버용 클라이언트 사용
+    const { data, error } = await supabaseAdmin
       .from("inquiries")
       .update({ status })
       .eq("id", id)
@@ -183,7 +184,8 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const { error } = await supabase
+    // RLS 우회를 위해 서버용 클라이언트 사용
+    const { error } = await supabaseAdmin
       .from("inquiries")
       .delete()
       .eq("id", id);
