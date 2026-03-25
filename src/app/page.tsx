@@ -591,8 +591,8 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-lg">R</span>
@@ -625,6 +625,32 @@ export default function Home() {
                   <a href="http://pf.kakao.com/_zxfugn/chat" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                     카카오톡: 로켓콜
                   </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-white mb-4">계열사</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href="https://rk-intro.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜 인트로</a>
+                </li>
+                <li>
+                  <a href="https://rocket-call.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_보험설계사</a>
+                </li>
+                <li>
+                  <a href="https://rocket-call-auto-dealer.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_자동차딜러</a>
+                </li>
+                <li>
+                  <a href="https://rocket-call-realestate.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_부동산분양</a>
+                </li>
+                <li>
+                  <a href="https://rocket-call-hospital.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_병원</a>
+                </li>
+                <li>
+                  <a href="https://rocket-call-franchise.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_프랜차이즈 가맹</a>
+                </li>
+                <li>
+                  <a href="https://rk-policy.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_정책자금</a>
                 </li>
               </ul>
             </div>
