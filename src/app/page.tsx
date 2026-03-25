@@ -102,6 +102,15 @@ export default function Home() {
               </svg>
               카카오톡 상담
             </a>
+            <button
+              onClick={scrollToForm}
+              className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full font-medium transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              상담 신청
+            </button>
           </div>
         </div>
       </header>
@@ -580,6 +589,14 @@ export default function Home() {
               >
                 {isSubmitting ? "처리 중..." : "상담 신청하기"}
               </button>
+              <a
+                href="http://pf.kakao.com/_zxfugn/chat"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full block text-center bg-yellow-400 hover:bg-yellow-500 text-gray-900 py-4 rounded-full font-bold text-lg transition-all hover:scale-105 shadow-lg"
+              >
+                카카오톡으로 상담하기
+              </a>
             </div>
             <p className="text-xs text-gray-500 text-center mt-4">
               입력하신 정보는 상담 목적으로만 사용되며, 개인정보 보호정책에 따라 안전하게 관리됩니다.
