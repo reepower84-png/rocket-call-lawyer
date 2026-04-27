@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, supabaseAdmin, Inquiry } from "@/lib/supabase";
+import { supabase, supabaseAdmin } from "@/lib/supabase";
 
-async function sendDiscordNotification(inquiry: Inquiry) {
+interface InquiryData {
+  name: string;
+  phone: string;
+  message: string;
+}
+
+async function sendDiscordNotification(inquiry: InquiryData) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
 
   if (!webhookUrl) {
@@ -69,33 +75,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const inquiry: Inquiry = {
+    const inquiry: InquiryData = {
       name,
       phone,
       message: message || "",
     };
 
-    // Save to Supabase
-    const { data, error } = await supabase
-      .from("inquiries")
-      .insert([inquiry])
-      .select();
-
-    if (error) {
-      console.error("Supabase error:", error);
-      return NextResponse.json(
-        { error: "데이터 저장 중 오류가 발생했습니다." },
-        { status: 500 }
-      );
+    // Best-effort: save to Supabase if available, but do not fail the request if it errors.
+    try {
+      const { error } = await supabaseAdmin
+        .from("inquiries")
+        .insert([inquiry]);
+      if (error) {
+        console.error("Supabase insert error (non-fatal):", error);
+      }
+    } catch (e) {
+      console.error("Supabase insert threw (non-fatal):", e);
     }
 
-    // Send Discord notification
     await sendDiscordNotification(inquiry);
 
     return NextResponse.json({
       success: true,
       message: "상담 신청이 완료되었습니다.",
-      data: data,
     });
   } catch (error) {
     console.error("Error processing inquiry:", error);
@@ -143,7 +145,6 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // RLS 우회를 위해 서버용 클라이언트 사용
     const { data, error } = await supabaseAdmin
       .from("inquiries")
       .update({ status })
@@ -184,7 +185,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // RLS 우회를 위해 서버용 클라이언트 사용
     const { error } = await supabaseAdmin
       .from("inquiries")
       .delete()
