@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
+import { backupFetch } from "../../../lib/inquiry-backup";
 
 interface InquiryData {
   name: string;
@@ -49,7 +50,7 @@ async function sendDiscordNotification(inquiry: InquiryData) {
   };
 
   try {
-    await fetch(webhookUrl, {
+    await backupFetch(webhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
